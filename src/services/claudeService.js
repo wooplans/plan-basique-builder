@@ -21,7 +21,7 @@ export async function analyzePlanImage(imageBase64) {
 Return ONLY the JSON object, no other text. If you cannot determine a value, use null.`;
 
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-3-5-sonnet-latest',
     max_tokens: 1024,
     messages: [{
       role: 'user',
@@ -62,7 +62,7 @@ export async function analyzeDevisPdf(pdfBase64) {
 Return ONLY the JSON object, no other text. Extract all line items with their quantities, unit prices and totals. If total HT/TTC are not explicitly shown, calculate them from the line items.`;
 
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-3-5-sonnet-latest',
     max_tokens: 2048,
     messages: [{
       role: 'user',
