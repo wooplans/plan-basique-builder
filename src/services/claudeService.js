@@ -23,7 +23,7 @@ Return ONLY the JSON object, no other text. If you cannot determine a value, use
 
   try {
     const response = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-latest',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 1024,
       messages: [{
         role: 'user',
@@ -86,7 +86,7 @@ Return ONLY the JSON object, no other text. Extract all line items with their qu
 
   try {
     const response = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-latest',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 2048,
       messages: [{
         role: 'user',
