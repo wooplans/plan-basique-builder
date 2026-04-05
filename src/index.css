@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #F5F0E8;
+  --color-gold: #D4AF37;
+  --color-brown: #8B4513;
+  --color-darkBlue: #2C3E50;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-darkBlue);
+  font-family: Georgia, serif;
+}

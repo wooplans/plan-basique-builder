@@ -1,0 +1,6 @@
+name = "plan-basique-devis"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+VITE_ANTHROPIC_API_KEY = ""
