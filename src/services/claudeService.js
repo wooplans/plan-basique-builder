@@ -21,31 +21,48 @@ export async function analyzePlanImage(imageBase64, apiKey) {
 
 Return ONLY the JSON object, no other text. If you cannot determine a value, use null.`;
 
-  const response = await anthropic.messages.create({
-    model: 'claude-3-5-sonnet-latest',
-    max_tokens: 1024,
-    messages: [{
-      role: 'user',
-      content: [{
-        type: 'image',
-        source: {
-          type: 'base64',
-          media_type: 'image/jpeg',
-          data: imageBase64,
-        },
-      }, {
-        type: 'text',
-        text: prompt,
+  try {
+    const response = await anthropic.messages.create({
+      model: 'claude-3-5-sonnet-latest',
+      max_tokens: 1024,
+      messages: [{
+        role: 'user',
+        content: [{
+          type: 'image',
+          source: {
+            type: 'base64',
+            media_type: 'image/jpeg',
+            data: imageBase64,
+          },
+        }, {
+          type: 'text',
+          text: prompt,
+        }],
       }],
-    }],
-  });
+    });
 
-  const text = response.content[0].text;
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (jsonMatch) {
-    return JSON.parse(jsonMatch[0]);
+    const text = response.content[0].text;
+    console.log('AI Response:', text);
+    
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0]);
+      console.log('Parsed data:', parsed);
+      return {
+        codePlan: parsed.codePlan || '',
+        type: parsed.type || 'Villa',
+        surface: String(parsed.surface || ''),
+        chambres: Number(parsed.chambres || 0),
+        pieces: Number(parsed.pieces || 0),
+        composition: Array.isArray(parsed.composition) ? parsed.composition : [],
+        description: parsed.description || '',
+      };
+    }
+    throw new Error('Failed to parse AI response');
+  } catch (error) {
+    console.error('Analysis error:', error);
+    throw error;
   }
-  throw new Error('Failed to parse AI response');
 }
 
 export async function analyzeDevisPdf(pdfBase64, apiKey) {
@@ -67,31 +84,46 @@ export async function analyzeDevisPdf(pdfBase64, apiKey) {
 
 Return ONLY the JSON object, no other text. Extract all line items with their quantities, unit prices and totals. If total HT/TTC are not explicitly shown, calculate them from the line items.`;
 
-  const response = await anthropic.messages.create({
-    model: 'claude-3-5-sonnet-latest',
-    max_tokens: 2048,
-    messages: [{
-      role: 'user',
-      content: [{
-        type: 'image',
-        source: {
-          type: 'base64',
-          media_type: 'application/pdf',
-          data: pdfBase64,
-        },
-      }, {
-        type: 'text',
-        text: prompt,
+  try {
+    const response = await anthropic.messages.create({
+      model: 'claude-3-5-sonnet-latest',
+      max_tokens: 2048,
+      messages: [{
+        role: 'user',
+        content: [{
+          type: 'image',
+          source: {
+            type: 'base64',
+            media_type: 'application/pdf',
+            data: pdfBase64,
+          },
+        }, {
+          type: 'text',
+          text: prompt,
+        }],
       }],
-    }],
-  });
+    });
 
-  const text = response.content[0].text;
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (jsonMatch) {
-    return JSON.parse(jsonMatch[0]);
+    const text = response.content[0].text;
+    console.log('AI Devis Response:', text);
+    
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0]);
+      console.log('Parsed devis data:', parsed);
+      return {
+        lignes: Array.isArray(parsed.lignes) ? parsed.lignes : [],
+        totalHT: Number(parsed.totalHT || 0),
+        tva: Number(parsed.tva || 0),
+        totalTTC: Number(parsed.totalTTC || 0),
+        dateDevis: parsed.dateDevis || new Date().toLocaleDateString('fr-FR'),
+      };
+    }
+    throw new Error('Failed to parse AI response');
+  } catch (error) {
+    console.error('Devis analysis error:', error);
+    throw error;
   }
-  throw new Error('Failed to parse AI response');
 }
 
 export function fileToBase64(file) {

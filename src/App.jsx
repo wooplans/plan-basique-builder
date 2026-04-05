@@ -85,22 +85,31 @@ function AnalyzeStep() {
 
     try {
       if (files.plan2d) {
+        console.log('Analyzing plan...');
         const planBase64 = await fileToBase64(files.plan2d);
+        console.log('Image converted to base64');
         const result = await analyzePlanImage(planBase64, apiKey);
+        console.log('Setting plan data:', result);
         setPlanData(result);
+        console.log('Plan data set');
       }
 
       if (files.devisPdf) {
+        console.log('Analyzing devis...');
         try {
           const devisResult = await parseDevisPdf(files.devisPdf);
+          console.log('Setting devis data:', devisResult);
           setDevisData(devisResult);
         } catch (e) {
           console.error('PDF parsing failed, using AI:', e);
           const devisBase64 = await fileToBase64(files.devisPdf);
           const aiResult = await analyzeDevisPdf(devisBase64, apiKey);
+          console.log('Setting devis data (AI):', aiResult);
           setDevisData(aiResult);
         }
       }
+      
+      console.log('Analysis complete');
     } catch (error) {
       console.error('Analysis error:', error);
       setAnalysisError(error.message);
