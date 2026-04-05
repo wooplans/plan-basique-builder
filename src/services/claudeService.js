@@ -1,11 +1,11 @@
 import Anthropic from '@anthropic-ai/sdk';
 
-const anthropic = new Anthropic({
-  apiKey: import.meta.env.VITE_ANTHROPIC_API_KEY,
-  dangerouslyAllowBrowser: true,
-});
+export async function analyzePlanImage(imageBase64, apiKey) {
+  const anthropic = new Anthropic({
+    apiKey: apiKey,
+    dangerouslyAllowBrowser: true,
+  });
 
-export async function analyzePlanImage(imageBase64) {
   const prompt = `Analyze this architectural floor plan image and extract the following information in JSON format:
 {
   "codePlan": "Extract the plan code if visible (format like V6-002 or D4-045)",
@@ -48,7 +48,12 @@ Return ONLY the JSON object, no other text. If you cannot determine a value, use
   throw new Error('Failed to parse AI response');
 }
 
-export async function analyzeDevisPdf(pdfBase64) {
+export async function analyzeDevisPdf(pdfBase64, apiKey) {
+  const anthropic = new Anthropic({
+    apiKey: apiKey,
+    dangerouslyAllowBrowser: true,
+  });
+
   const prompt = `Extract the detailed estimate (devis) information from this document and return a JSON object with this format:
 {
   "lignes": [

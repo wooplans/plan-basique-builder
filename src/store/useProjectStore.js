@@ -73,6 +73,12 @@ const useProjectStore = create((set, get) => ({
     pdfOptions: { ...state.pdfOptions, ...options }
   })),
 
+  apiKey: localStorage.getItem('anthropic_api_key') || '',
+  setApiKey: (key) => {
+    localStorage.setItem('anthropic_api_key', key);
+    set({ apiKey: key });
+  },
+
   isAnalyzing: false,
   analysisError: null,
   setAnalyzing: (status) => set({ isAnalyzing: status, analysisError: null }),

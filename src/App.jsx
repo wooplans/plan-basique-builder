@@ -71,17 +71,22 @@ function UploadStep() {
 }
 
 function AnalyzeStep() {
-  const { files, planData, setPlanData, devisData, setDevisData, isAnalyzing, setAnalyzing, setAnalysisError, analysisError } = useProjectStore();
+  const { files, planData, setPlanData, devisData, setDevisData, isAnalyzing, setAnalyzing, setAnalysisError, analysisError, apiKey, setApiKey } = useProjectStore();
   const [manualEdit, setManualEdit] = useState(false);
 
   const handleAnalyze = async () => {
+    if (!apiKey) {
+      setAnalysisError('Veuillez entrer votre clé API Anthropic');
+      return;
+    }
+    
     setAnalyzing(true);
     setAnalysisError(null);
 
     try {
       if (files.plan2d) {
         const planBase64 = await fileToBase64(files.plan2d);
-        const result = await analyzePlanImage(planBase64);
+        const result = await analyzePlanImage(planBase64, apiKey);
         setPlanData(result);
       }
 
@@ -92,7 +97,7 @@ function AnalyzeStep() {
         } catch (e) {
           console.error('PDF parsing failed, using AI:', e);
           const devisBase64 = await fileToBase64(files.devisPdf);
-          const aiResult = await analyzeDevisPdf(devisBase64);
+          const aiResult = await analyzeDevisPdf(devisBase64, apiKey);
           setDevisData(aiResult);
         }
       }
@@ -119,11 +124,23 @@ function AnalyzeStep() {
   return (
     <div className="space-y-6">
       <Card title="Analyse Automatique">
+        <div className="mb-4">
+          <Input
+            label="Clé API Anthropic"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            placeholder="sk-ant-api03-..."
+            type="password"
+          />
+          <p className="text-xs text-brown opacity-70 mt-1">
+            Votre clé API est stockée localement dans votre navigateur.
+          </p>
+        </div>
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-brown">
             L'IA va analyser le plan 2D et le PDF devis pour extraire les données.
           </p>
-          <Button onClick={handleAnalyze} disabled={isAnalyzing || (!files.plan2d && !files.devisPdf)}>
+          <Button onClick={handleAnalyze} disabled={isAnalyzing || (!files.plan2d && !files.devisPdf) || !apiKey}>
             {isAnalyzing ? 'Analyse en cours...' : '🔍 Analyser avec IA'}
           </Button>
         </div>
